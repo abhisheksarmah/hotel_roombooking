@@ -92,6 +92,7 @@ $_SESSION["page"] = "search.php";
                 $_SESSION["cin"] = $cindate;
                 $_SESSION["cout"] = $coutdate;
                 $_SESSION["nor"] = $nor;
+                $_SESSION["nog"] = $nog;
             }
             ?>
             <form name="form1" id="form1" method="post" action="search.php">
