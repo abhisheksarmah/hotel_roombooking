@@ -140,7 +140,9 @@ $_SESSION["page"] = "search.php";
                     $star = $_POST["star"];
                     $sql = "Select * from hotels where city='$city' and star='$star'";
                 } else {
-                    $sql = "Select * from hotels where city='$city'";
+                    $sql = "select * from hotels 
+                    where city='$city'
+                    order by star desc";
                 }
                 $result = mysqli_query($con, $sql);
                 ?>

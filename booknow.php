@@ -94,7 +94,6 @@ $contact = $row1[4];
                             </div>
                         </div>
                         <?php
-                        $rr = $_SESSION["nor"];
                         $cind = $_SESSION["cin"];
                         $coutd = $_SESSION["cout"];
                         $roomid = $_GET["room"];
@@ -102,22 +101,25 @@ $contact = $row1[4];
                         $result = mysqli_query($con, $str);
                         $row = mysqli_fetch_array($result);
                         $photo = $row["photo"];
-                        $roomtype = $row["roomtype"];
-                        $rate = $row["rate"];
-                        $nor = $row["nor"];
+                        $roomType = $row["roomtype"];
+                        $ratePerRoom = $row["rate"];
+                        $noOfRooms = $row["nor"];
+                        $maxGuests = $row["guests"];
 
                         $str = "Select count(*) from booked where roomid='$roomid' and date='$cind'";
                         $result = mysqli_query($con, $str);
                         $row = mysqli_fetch_array($result);
-                        $rb = $row[0];
-                        $ra = $nor - $rb;
+                        $roomBooked = $row[0];
+                        $roomAvailable = $noOfRooms - $roomBooked;
 
-                        if ($rr > $ra) {
+                        $roomRequired = ceil($_SESSION["nog"] / $maxGuests);
+
+                        if ($roomRequired > $roomAvailable) {
                             header("location:index.php?room=0");
                             return;
                         }
 
-                        $amount = $rate * $rr;
+                        $amount = $ratePerRoom * $roomRequired;
                         $date1 = date_create($cind);
                         $date2 = date_create($coutd);
                         $diff = date_diff($date1, $date2);
@@ -151,19 +153,27 @@ $contact = $row1[4];
                                 </p>
                                 <p>
                                     <label>Room Type <i class="fa fa-bed" aria-hidden="true"></i></label>
-                                    <input type="text" name="roomtype" class="w3-input w3-border" value="<?php echo $roomtype; ?>" readonly>
+                                    <input type="text" name="roomtype" class="w3-input w3-border" value="<?php echo $roomType; ?>" readonly>
                                 </p>
                                 <p>
                                     <label>No. of Rooms <i class="fa fa-bed" aria-hidden="true"></i></label>
-                                    <input type="text" name="norooms" class="w3-input w3-border" value="<?php echo $_SESSION["nor"]; ?>" readonly>
+                                    <input type="number" name="norooms" id="nor" min="1" class="w3-input w3-border" value="<?php echo $roomRequired; ?>" readonly>
+                                </p>
+                                <p>
+                                    <label>No. of Guests <i class="fa fa-bed" aria-hidden="true"></i></label>
+                                    <input type="number" name="noguests" id="nog" min="1" class="w3-input w3-border" value="<?php echo $_SESSION["nog"]; ?>">
                                 </p>
                                 <p>
                                     <label>Amount <i class="fa fa-money" aria-hidden="true"></i></label>
-                                    <input type="text" name="amount" class="w3-input w3-border" value="<?php echo $netamount; ?>" readonly>
+                                    <input type="text" name="amount" id="netamount" class="w3-input w3-border" value="<?php echo $netamount; ?>" readonly>
                                 </p>
                                 <p>
                                     <input type="submit" name="submit" value="Confirm Booking" class="w3-btn w3-block w3-round w3-red">
                                 </p>
+
+                                <input type="hidden" id="days" value="<?php echo $days; ?>">
+                                <input type="hidden" id="max-guests" value="<?php echo $maxGuests; ?>">
+                                <input type="hidden" id="rate-per-room" value="<?php echo $ratePerRoom; ?>">
                             </form>
                         </div>
                     </div>
@@ -173,7 +183,7 @@ $contact = $row1[4];
                             <?php {
                                 echo '<div class="w3-container" style="margin-bottom:4px;">
 										<img src="' . $photo . '" style="width:100%; height:120px;">
-										<h5 class="w3-text-blue mt-3">' . $roomtype . '&nbsp;|&nbsp; Rs. ' . $rate . ' / Room
+										<h5 class="w3-text-blue mt-3">' . $roomType . '&nbsp;|&nbsp; Rs. ' . $ratePerRoom . ' / Room
 										</h5>
 									</div>';
                             }
@@ -272,6 +282,21 @@ if (isset($_GET["user"])) {
 ?>
 
 <script>
+    var nor = document.getElementById("nor");
+    var nog = document.getElementById("nog");
+    var maxGuests = document.getElementById("max-guests");
+    var days = document.getElementById("days");
+    var ratePerRoom = document.getElementById("rate-per-room");
+    var netamount = document.getElementById("netamount");
+
+    nog.addEventListener("change", function(e) {
+        let noOfGuests = e.target.value;
+        let roomNeeded = Math.ceil(noOfGuests / maxGuests.value);
+        nor.setAttribute('value', roomNeeded)
+        let amount = ratePerRoom.value * roomNeeded;
+        netamount.setAttribute('value', days.value * amount)
+    });
+
     var slideIndex = 1;
     showSlides(slideIndex);
 

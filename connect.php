@@ -1,3 +1,3 @@
 <?php
-    $con=mysqli_connect("localhost","root","","hotel") or die("could not connect");
+    $con=mysqli_connect("localhost","root","root","hotelbooking") or die("could not connect");
 ?>
