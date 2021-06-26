@@ -1,0 +1,32 @@
+<?php
+	session_start();
+	include "connect.php";
+	if(isset($_POST["login"]))
+	{
+		$uname=$_POST["username"];
+		$password=$_POST["password"];
+		$sql="SELECT * FROM customer WHERE email='$uname'";
+		$result=mysqli_query($con,$sql);
+		$n=mysqli_num_rows($result);
+		if($n>0) 
+		{
+			while($row=mysqli_fetch_array($result))
+			{
+				if($row["password"]==$password)
+				{
+					$_SESSION["uname"]=$uname;
+					$_SESSION["status"]=true;
+					header("location:index.php");
+				}	
+				else
+				{
+					header("location:index.php?err=1");	
+				}
+			}
+		}
+		else
+		{
+			header("location:index.php?err=2");	
+		}
+    }
+?>
